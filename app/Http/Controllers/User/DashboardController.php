@@ -11,24 +11,26 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        $totalProperties = $user->properties()->count();
-        $totalWishlist   = $user->wishlist()->count();
+        return view('user.dashboard', [
+            'totalProperties'    => $user->properties()->count(),
+            'totalWishlist'      => $user->wishlist()->count(),
+            'totalInquiries'     => Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))->count(),
+            'newInquiries'       => Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))->where('is_read', false)->count(),
 
-        $receivedInquiries = Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id));
-        $totalInquiries    = $receivedInquiries->count();
-        $newInquiries      = Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))
-                                    ->where('is_read', false)->count();
+            // Dynamic badge: properties created this calendar month
+            'propertiesThisMonth' => $user->properties()
+                                         ->whereMonth('created_at', now()->month)
+                                         ->whereYear('created_at', now()->year)
+                                         ->count(),
 
-        $recentInquiries  = Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))
-            ->with(['sender', 'property'])
-            ->latest()->take(3)->get();
+            // Dynamic badge: wishlist items added in the last 7 days
+            'wishlistThisWeek'   => $user->wishlist()
+                                         ->wherePivot('added_at', '>=', now()->subDays(7))
+                                         ->count(),
 
-        $recentProperties = $user->properties()->with('category')->latest()->take(3)->get();
-
-        return view('user.dashboard', compact(
-            'totalProperties', 'totalWishlist',
-            'totalInquiries', 'newInquiries',
-            'recentInquiries', 'recentProperties'
-        ));
+            'recentInquiries'    => Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))
+                                        ->with(['property', 'sender'])->latest()->take(3)->get(),
+            'recentProperties'   => $user->properties()->latest()->take(3)->get(),
+        ]);
     }
 }
