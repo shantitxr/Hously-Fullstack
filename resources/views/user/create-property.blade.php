@@ -1,4 +1,3 @@
-
 @extends('layouts.dashboard')
 
 @section('title', 'Create Property')
@@ -35,17 +34,33 @@
                     class="textarea textarea-bordered bg-background border-accent focus:border-primary rounded-xl w-full"
                     placeholder="Describe your property in detail...">{{ old('description') }}</textarea>
         </div>
+
+        {{-- SELECT DROPDOWN (required input type) --}}
         <div class="form-control">
-          <label class="label"><span class="label-text text-dark font-medium">Property Type *</span></label>
-          <select name="type" class="select select-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required>
-            <option disabled {{ old('type') ? '' : 'selected' }}>Select type</option>
-            <option value="apartment" {{ old('type') === 'apartment' ? 'selected' : '' }}>Apartment</option>
-            <option value="house"     {{ old('type') === 'house'     ? 'selected' : '' }}>House</option>
-            <option value="villa"     {{ old('type') === 'villa'     ? 'selected' : '' }}>Villa</option>
-            <option value="studio"    {{ old('type') === 'studio'    ? 'selected' : '' }}>Studio</option>
+          <label class="label"><span class="label-text text-dark font-medium">Category *</span></label>
+          <select name="category_id" class="select select-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required>
+            <option value="" disabled {{ old('category_id') ? '' : 'selected' }}>Select category</option>
+            @foreach($categories as $category)
+              <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+              </option>
+            @endforeach
           </select>
         </div>
+
         <div class="form-control">
+          <label class="label"><span class="label-text text-dark font-medium">Property Type *</span></label>
+          <select name="property_type" class="select select-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required>
+            <option value="" disabled {{ old('property_type') ? '' : 'selected' }}>Select type</option>
+            <option value="apartment" {{ old('property_type') === 'apartment' ? 'selected' : '' }}>Apartment</option>
+            <option value="house"     {{ old('property_type') === 'house'     ? 'selected' : '' }}>House</option>
+            <option value="villa"     {{ old('property_type') === 'villa'     ? 'selected' : '' }}>Villa</option>
+            <option value="studio"    {{ old('property_type') === 'studio'    ? 'selected' : '' }}>Studio</option>
+          </select>
+        </div>
+
+        {{-- RADIO BUTTONS (required input type) --}}
+        <div class="form-control md:col-span-2">
           <label class="label"><span class="label-text text-dark font-medium">Listing Type *</span></label>
           <div class="flex gap-6 mt-2">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -73,9 +88,10 @@
                  placeholder="e.g., 850"
                  class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required />
         </div>
+        {{-- NOTE: field name is sq_meters to match the database column and controller --}}
         <div class="form-control">
           <label class="label"><span class="label-text text-dark font-medium">Area (m²) *</span></label>
-          <input type="number" name="area_sqm" value="{{ old('area_sqm') }}" min="1"
+          <input type="number" name="sq_meters" value="{{ old('sq_meters') }}" min="1"
                  placeholder="e.g., 65"
                  class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required />
         </div>
@@ -113,38 +129,39 @@
                  placeholder="e.g., Budapest"
                  class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required />
         </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text text-dark font-medium">Country *</span></label>
-          <input type="text" name="country" value="{{ old('country') }}"
-                 placeholder="e.g., Hungary"
-                 class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required />
-        </div>
       </div>
     </div>
 
-    {{-- Amenities (checkbox list) --}}
+    {{-- Amenities — CHECKBOX LIST (required input type) --}}
     <div class="bg-white rounded-2xl p-6 shadow-md mb-6">
-      <h2 class="text-xl font-semibold text-dark mb-6">Amenities</h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        @foreach($amenities as $amenity)
-          <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
-            <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}"
-                   class="checkbox checkbox-primary"
-                   {{ in_array($amenity->id, old('amenities', [])) ? 'checked' : '' }} />
-            <span class="text-dark">{{ $amenity->name }}</span>
-          </label>
-        @endforeach
+      <h2 class="text-xl font-semibold text-dark mb-4">Amenities</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
+          <input type="checkbox" name="has_pool" value="1" class="checkbox checkbox-primary"
+                 {{ old('has_pool') ? 'checked' : '' }} />
+          <span class="text-dark">Swimming Pool</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
+          <input type="checkbox" name="has_gym" value="1" class="checkbox checkbox-primary"
+                 {{ old('has_gym') ? 'checked' : '' }} />
+          <span class="text-dark">Gym</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
+          <input type="checkbox" name="has_parking" value="1" class="checkbox checkbox-primary"
+                 {{ old('has_parking') ? 'checked' : '' }} />
+          <span class="text-dark">Parking</span>
+        </label>
       </div>
     </div>
 
-    {{-- Images (file upload) --}}
+    {{-- FILE UPLOAD (required input type) --}}
     <div class="bg-white rounded-2xl p-6 shadow-md mb-6">
-      <h2 class="text-xl font-semibold text-dark mb-6">Property Images</h2>
+      <h2 class="text-xl font-semibold text-dark mb-6">Property Image</h2>
       <div class="form-control">
-        <label class="label"><span class="label-text text-dark font-medium">Upload Images (max 10)</span></label>
-        <input type="file" name="images[]" multiple accept="image/*"
+        <label class="label"><span class="label-text text-dark font-medium">Upload Image</span></label>
+        <input type="file" name="image" accept="image/*"
                class="file-input file-input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" />
-        <label class="label"><span class="label-text-alt text-gray-500">JPEG, PNG, max 2MB each</span></label>
+        <label class="label"><span class="label-text-alt text-gray-500">JPEG, PNG, max 2MB</span></label>
       </div>
     </div>
 

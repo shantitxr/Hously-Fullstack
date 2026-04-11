@@ -1,4 +1,3 @@
-
 @extends('layouts.dashboard')
 
 @section('title', 'Dashboard')
@@ -76,16 +75,16 @@
           <div class="flex items-start gap-4 p-4 bg-background rounded-xl">
             <div class="w-10 h-10 bg-accent rounded-full flex items-center justify-center shrink-0">
               <span class="text-primary font-semibold text-sm">
-                {{ strtoupper(substr($inquiry->name, 0, 2)) }}
+                {{ strtoupper(substr($inquiry->sender->name ?? 'U', 0, 2)) }}
               </span>
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
-                <p class="font-medium text-dark">{{ $inquiry->name }}</p>
+                <p class="font-medium text-dark">{{ $inquiry->sender->name ?? 'Unknown' }}</p>
                 <span class="text-xs text-gray-500">{{ $inquiry->created_at->diffForHumans() }}</span>
               </div>
               <p class="text-sm text-gray-500 truncate">{{ $inquiry->message }}</p>
-              <p class="text-xs text-primary mt-1">Via {{ ucfirst($inquiry->contact_method) }}</p>
+              <p class="text-xs text-primary mt-1">Via {{ ucfirst($inquiry->preferred_contact) }}</p>
             </div>
           </div>
         @empty
@@ -103,15 +102,15 @@
       <div class="space-y-4">
         @forelse($recentProperties as $property)
           <div class="flex items-center gap-4 p-3 bg-background rounded-xl">
-            <img src="{{ $property->images->first() ? Storage::url($property->images->first()->path) : 'https://placehold.co/100x80' }}"
+            <img src="{{ $property->image_path ? Storage::url($property->image_path) : 'https://placehold.co/100x80' }}"
                  alt="{{ $property->title }}"
                  class="w-16 h-14 object-cover rounded-lg"/>
             <div class="flex-1 min-w-0">
               <p class="font-medium text-dark truncate">{{ $property->title }}</p>
               <p class="text-sm text-gray-500">€{{ number_format($property->price) }}</p>
             </div>
-            <span class="badge {{ $property->is_active ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }} border-none">
-              {{ $property->is_active ? 'Active' : 'Pending' }}
+            <span class="badge {{ $property->is_available ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }} border-none">
+              {{ $property->is_available ? 'Active' : 'Unavailable' }}
             </span>
           </div>
         @empty

@@ -1,4 +1,3 @@
-
 @extends('layouts.admin')
 
 @section('title', 'Manage Users')
@@ -80,7 +79,7 @@
                 </div>
                 <div>
                   <h4 class="font-semibold text-secondary">{{ $user->name }}</h4>
-                  <p class="text-sm text-gray-500">@{{ Str::lower(Str::replace(' ', '', $user->name)) }}</p>
+                  <p class="text-sm text-gray-500">{{ Str::lower(Str::replace(' ', '', $user->name)) }}</p>
                 </div>
               </div>
             </td>

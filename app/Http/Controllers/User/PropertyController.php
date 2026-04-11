@@ -51,6 +51,9 @@ class PropertyController extends Controller
             $validated['image_path'] = $request->file('image')->store('properties', 'public');
         }
 
+        // Remove the 'image' key — the DB column is 'image_path', not 'image'
+        unset($validated['image']);
+
         auth()->user()->properties()->create($validated);
 
         return redirect()->route('user.properties.index')->with('success', 'Property created!');
@@ -58,12 +61,14 @@ class PropertyController extends Controller
 
     public function edit(Property $property)
     {
+         abort_if($property->user_id !== auth()->id(), 403);
         $categories = Category::all();
         return view('user.edit-property', compact('property', 'categories'));
     }
 
     public function update(Request $request, Property $property)
     {
+        abort_if($property->user_id !== auth()->id(), 403);
         $validated = $request->validate([
             'title'           => 'required|string|max:255',
             'description'     => 'required|string',
@@ -95,6 +100,9 @@ class PropertyController extends Controller
             $validated['image_path'] = $request->file('image')->store('properties', 'public');
         }
 
+        // Remove the 'image' key — the DB column is 'image_path', not 'image'
+        unset($validated['image']);
+
         $property->update($validated);
 
         return redirect()->route('user.properties.index')->with('success', 'Property updated!');
@@ -102,6 +110,7 @@ class PropertyController extends Controller
 
     public function destroy(Property $property)
     {
+        abort_if($property->user_id !== auth()->id(), 403);
         if ($property->image_path) {
             Storage::disk('public')->delete($property->image_path);
         }

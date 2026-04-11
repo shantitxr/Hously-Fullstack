@@ -1,4 +1,3 @@
-
 @extends('layouts.dashboard')
 
 @section('title', 'Edit Property')
@@ -7,7 +6,9 @@
 @section('content')
   <form method="POST" action="{{ route('user.properties.update', $property) }}"
         enctype="multipart/form-data" class="max-w-4xl">
-    @csrf @method('PUT')
+    @csrf
+    {{-- NOTE: using POST + hidden _method because the route uses Route::post() not Route::put() --}}
+    <input type="hidden" name="_method" value="POST">
 
     @if($errors->any())
       <div class="alert alert-error mb-6">
@@ -33,17 +34,32 @@
           <textarea name="description" rows="4"
                     class="textarea textarea-bordered bg-background border-accent focus:border-primary rounded-xl w-full">{{ old('description', $property->description) }}</textarea>
         </div>
+
+        {{-- SELECT DROPDOWN --}}
+        <div class="form-control">
+          <label class="label"><span class="label-text text-dark font-medium">Category *</span></label>
+          <select name="category_id" class="select select-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required>
+            @foreach($categories as $category)
+              <option value="{{ $category->id }}" {{ old('category_id', $property->category_id) == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+              </option>
+            @endforeach
+          </select>
+        </div>
+
         <div class="form-control">
           <label class="label"><span class="label-text text-dark font-medium">Property Type *</span></label>
-          <select name="type" class="select select-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required>
+          <select name="property_type" class="select select-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required>
             @foreach(['apartment','house','villa','studio'] as $type)
-              <option value="{{ $type }}" {{ old('type', $property->type) === $type ? 'selected' : '' }}>
+              <option value="{{ $type }}" {{ old('property_type', $property->property_type) === $type ? 'selected' : '' }}>
                 {{ ucfirst($type) }}
               </option>
             @endforeach
           </select>
         </div>
-        <div class="form-control">
+
+        {{-- RADIO BUTTONS --}}
+        <div class="form-control md:col-span-2">
           <label class="label"><span class="label-text text-dark font-medium">Listing Type *</span></label>
           <div class="flex gap-6 mt-2">
             <label class="flex items-center gap-2 cursor-pointer">
@@ -72,7 +88,7 @@
         </div>
         <div class="form-control">
           <label class="label"><span class="label-text text-dark font-medium">Area (m²) *</span></label>
-          <input type="number" name="area_sqm" value="{{ old('area_sqm', $property->area_sqm) }}" min="1"
+          <input type="number" name="sq_meters" value="{{ old('sq_meters', $property->sq_meters) }}" min="1"
                  class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required />
         </div>
         <div class="form-control">
@@ -91,8 +107,8 @@
                  class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" />
         </div>
         <div class="form-control flex-row items-center gap-3 mt-8">
-          <input type="checkbox" name="is_active" value="1" class="checkbox checkbox-primary"
-                 {{ old('is_active', $property->is_active) ? 'checked' : '' }} />
+          <input type="checkbox" name="is_available" value="1" class="checkbox checkbox-primary"
+                 {{ old('is_available', $property->is_available) ? 'checked' : '' }} />
           <label class="label-text text-dark font-medium">Active listing</label>
         </div>
       </div>
@@ -112,53 +128,44 @@
           <input type="text" name="city" value="{{ old('city', $property->city) }}"
                  class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required />
         </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text text-dark font-medium">Country *</span></label>
-          <input type="text" name="country" value="{{ old('country', $property->country) }}"
-                 class="input input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" required />
-        </div>
       </div>
     </div>
 
-    {{-- Amenities --}}
+    {{-- Amenities CHECKBOX LIST --}}
     <div class="bg-white rounded-2xl p-6 shadow-md mb-6">
-      <h2 class="text-xl font-semibold text-dark mb-6">Amenities</h2>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-        @foreach($amenities as $amenity)
-          <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
-            <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}"
-                   class="checkbox checkbox-primary"
-                   {{ in_array($amenity->id, old('amenities', $property->amenities->pluck('id')->toArray())) ? 'checked' : '' }} />
-            <span class="text-dark">{{ $amenity->name }}</span>
-          </label>
-        @endforeach
+      <h2 class="text-xl font-semibold text-dark mb-4">Amenities</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
+          <input type="checkbox" name="has_pool" value="1" class="checkbox checkbox-primary"
+                 {{ old('has_pool', $property->has_pool) ? 'checked' : '' }} />
+          <span class="text-dark">Swimming Pool</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
+          <input type="checkbox" name="has_gym" value="1" class="checkbox checkbox-primary"
+                 {{ old('has_gym', $property->has_gym) ? 'checked' : '' }} />
+          <span class="text-dark">Gym</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 bg-background rounded-xl cursor-pointer hover:bg-accent transition-colors">
+          <input type="checkbox" name="has_parking" value="1" class="checkbox checkbox-primary"
+                 {{ old('has_parking', $property->has_parking) ? 'checked' : '' }} />
+          <span class="text-dark">Parking</span>
+        </label>
       </div>
     </div>
 
-    {{-- Existing Images --}}
-    @if($property->images->isNotEmpty())
+    {{-- Current Image --}}
+    @if($property->image_path)
       <div class="bg-white rounded-2xl p-6 shadow-md mb-6">
-        <h2 class="text-xl font-semibold text-dark mb-4">Current Images</h2>
-        <div class="flex flex-wrap gap-3">
-          @foreach($property->images as $image)
-            <div class="relative">
-              <img src="{{ Storage::url($image->path) }}" class="w-24 h-20 object-cover rounded-lg" />
-              <form method="POST" action="{{ route('user.properties.images.destroy', $image) }}"
-                    onsubmit="return confirm('Remove this image?')">
-                @csrf @method('DELETE')
-                <button type="submit"
-                        class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
-              </form>
-            </div>
-          @endforeach
-        </div>
+        <h2 class="text-xl font-semibold text-dark mb-4">Current Image</h2>
+        <img src="{{ Storage::url($property->image_path) }}"
+             class="w-48 h-36 object-cover rounded-xl" alt="Current property image" />
       </div>
     @endif
 
-    {{-- New Images --}}
+    {{-- FILE UPLOAD --}}
     <div class="bg-white rounded-2xl p-6 shadow-md mb-6">
-      <h2 class="text-xl font-semibold text-dark mb-6">Add More Images</h2>
-      <input type="file" name="images[]" multiple accept="image/*"
+      <h2 class="text-xl font-semibold text-dark mb-6">{{ $property->image_path ? 'Replace Image' : 'Upload Image' }}</h2>
+      <input type="file" name="image" accept="image/*"
              class="file-input file-input-bordered bg-background border-accent focus:border-primary rounded-xl w-full" />
     </div>
 

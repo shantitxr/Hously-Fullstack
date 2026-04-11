@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -59,6 +58,18 @@
           </a>
         </li>
       </ul>
+      @if(auth()->user()->role === 'admin')
+      <div class="border-t border-accent mt-6 pt-6">
+        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Admin</p>
+        <ul class="space-y-2">
+          <li>
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium {{ request()->routeIs('admin.*') ? 'bg-primary text-white' : 'text-dark hover:bg-accent' }} transition-colors">
+              Admin Panel
+            </a>
+          </li>
+        </ul>
+      </div>
+      @endif
       <div class="border-t border-accent mt-6 pt-6">
         <ul class="space-y-2">
           <li>

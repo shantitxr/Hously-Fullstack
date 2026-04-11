@@ -57,18 +57,18 @@
           <tr class="hover:bg-gray-50 transition">
             <td class="px-6 py-4">
               <div class="flex items-center gap-3">
-                @if($property->images->isNotEmpty())
-                  <img src="{{ Storage::url($property->images->first()->path) }}"
-                       class="w-12 h-12 rounded-lg object-cover">
-                @else
-                  <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                    <i class="fas fa-home text-gray-400"></i>
-                  </div>
-                @endif
-                <div>
-                  <h4 class="font-semibold text-secondary">{{ $property->title }}</h4>
-                  <p class="text-sm text-gray-500">{{ $property->city }}, {{ $property->country }}</p>
-                </div>
+          @if($property->image_path)
+            <img src="{{ Storage::url($property->image_path) }}"
+                class="w-12 h-12 rounded-lg object-cover">
+          @else
+            <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+              <i class="fas fa-home text-gray-400"></i>
+            </div>
+          @endif
+          <div>
+            <h4 class="font-semibold text-secondary">{{ $property->title }}</h4>
+            <p class="text-sm text-gray-500">{{ $property->city }}</p>
+          </div>
               </div>
             </td>
             <td class="px-6 py-4 text-gray-600">{{ $property->user->name }}</td>

@@ -11,14 +11,24 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        return view('user.dashboard', [
-            'totalProperties'  => $user->properties()->count(),
-            'totalWishlist'    => $user->wishlist()->count(),
-            'totalInquiries'   => Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))->count(),
-            'newInquiries'     => Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))->where('is_read', false)->count(),
-            'recentInquiries'  => Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))
-                                    ->with(['property', 'sender'])->latest()->take(3)->get(),
-            'recentProperties' => $user->properties()->with('category')->latest()->take(3)->get(),
-        ]);
+        $totalProperties = $user->properties()->count();
+        $totalWishlist   = $user->wishlist()->count();
+
+        $receivedInquiries = Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id));
+        $totalInquiries    = $receivedInquiries->count();
+        $newInquiries      = Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))
+                                    ->where('is_read', false)->count();
+
+        $recentInquiries  = Inquiry::whereHas('property', fn($q) => $q->where('user_id', $user->id))
+            ->with(['sender', 'property'])
+            ->latest()->take(3)->get();
+
+        $recentProperties = $user->properties()->with('category')->latest()->take(3)->get();
+
+        return view('user.dashboard', compact(
+            'totalProperties', 'totalWishlist',
+            'totalInquiries', 'newInquiries',
+            'recentInquiries', 'recentProperties'
+        ));
     }
 }
