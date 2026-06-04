@@ -1,58 +1,59 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hously 🏠
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Hously is a modern, full-stack real estate and rental management platform designed to streamline how users discover properties, manage personal listings, and connect directly with property owners. 
 
-## About Laravel
+Built as a decoupled Single Page Application (SPA), Hously provides a fluid, responsive user experience backed by a secure, robust headless RESTful API[cite: 1].
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 👤 Guest (Unauthenticated)
+* **Discover & Browse:** Explore featured listings on the landing page with intuitive filtering options[cite: 1].
+* **Detailed View:** View comprehensive property specifications, high-quality media galleries, availability dates, and amenities[cite: 1].
+* **Quick Onboarding:** Simple, secure guest registration and login workflows[cite: 1].
 
-## Learning Laravel
+### 🔐 Authenticated User
+* **Property CRUD:** Create, read, update, and delete personal property listings with data restricted tightly to the owner via Laravel Policies[cite: 1].
+* **Interactive Wishlist:** Seamlessly save and organize target properties utilizing a persistent Many-to-Many toggle interface[cite: 1].
+* **Inquiry Management:** Send instant contact requests to property owners and manage incoming buyer/tenant inquiries via a dedicated inbox dashboard[cite: 1].
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 👑 Admin (Superuser)
+* **Global Moderation:** Complete CRUD access over all system listings and property categories[cite: 1].
+* **User Control:** Monitor and manage user accounts with administrative tools to edit, suspend, or delete accounts[cite: 1].
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## ⚡ Non-Trivial Implementation: Multi-Step Property Wizard
+Located on the `/properties/create` route, Hously implements a highly interactive, 3-step property creation wizard that relies entirely on complex client-side state[cite: 1]:
+1. **Dynamic Form Layouts:** Early data selections (such as *Rent* vs. *Sale*) adaptively update the form fields and pricing logic required in later steps[cite: 1].
+2. **Real-Time Financial Calculator:** Features instantaneous client-side mathematical processing using React `useMemo`[cite: 1]:
+   * **For Rent:** Automatically renders the exact price per square meter ($Price / m^2$)[cite: 1].
+   * **For Sale:** Dynamically calculates an estimated monthly mortgage payment using a real-time localized formula[cite: 1].
+3. **Local State Persistence:** Retains data integrity seamlessly across the wizard steps before making a consolidated multi-part dispatch to the API backend[cite: 1].
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🛠️ Technology Stack
 
-```bash
-composer require laravel/boost --dev
+### Backend
+* **Framework:** Laravel (PHP 8.x) acting as a headless RESTful API[cite: 1]
+* **Authentication:** Laravel Breeze + Sanctum (Secure Bearer Tokens)[cite: 1]
+* **Database:** SQLite (Lightweight, efficient relational storage)[cite: 1]
 
-php artisan boost:install
-```
+### Frontend
+* **Library:** React[cite: 1]
+* **State Management & Caching:** TanStack Query (React Query) for smooth server-state synchronization[cite: 1]
+* **Styling:** Tailwind CSS[cite: 1]
+* **UI Components:** Flowbite React[cite: 1]
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 📊 Database Architecture
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The data structure relies on a clean, relational design built across 5 main tables[cite: 1]:
+* `users` - Manages credentials, profile media, and application access roles (`user`, `admin`)[cite: 1].
+* `properties` - The central model housing 20 distinct attribute fields including size ($m^2$), pricing, types, and Boolean amenities[cite: 1].
+* `categories` - Dynamic classification lookups for property filtering (e.g., Apartment, House, Villa)[cite: 1].
+* `inquiries` - Relational logs managing contact requests with sender validation and custom communication preference enums[cite: 1].
+* `property_user` (Pivot) - Standardized relationship mapper driving the custom *Wishlist* feature (Many-to-Many)[cite: 1].
