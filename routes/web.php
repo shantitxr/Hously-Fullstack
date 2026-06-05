@@ -21,7 +21,13 @@ Route::get('/', function () {
         ->when(request('type'), fn($q) => $q->where('property_type', request('type')))
         ->when(request('listing_type'), fn($q) => $q->where('listing_type', request('listing_type')))
         ->latest()->paginate(12);
-    return view('index', compact('properties'));
+
+    // Pass wishlist IDs so the heart icon shows filled/empty correctly
+    $wishlistIds = auth()->check()
+        ? auth()->user()->wishlist()->pluck('properties.id')->toArray()
+        : [];
+
+    return view('index', compact('properties', 'wishlistIds'));
 })->name('home');
 
 Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
