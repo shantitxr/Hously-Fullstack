@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\Admin\AdminPropertyApiController;
 use App\Models\Category;
 use Illuminate\Support\Facades\Route;
 
-// ─── Public endpoints ───────────────────────────────────────────
+//Public endpoints 
 Route::post('/register', [AuthApiController::class, 'register']);
 Route::post('/login',    [AuthApiController::class, 'login']);
 
@@ -17,7 +17,7 @@ Route::get('/properties',       [PropertyApiController::class, 'index']);
 Route::get('/properties/{id}',  [PropertyApiController::class, 'show']);
 Route::get('/categories',       fn() => response()->json(Category::all()));
 
-// ─── Authenticated endpoints ────────────────────────────────────
+//Authenticated endpoints 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthApiController::class, 'logout']);
     Route::get('/user',    fn(\Illuminate\Http\Request $r) => response()->json($r->user()));
@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/inquiries/{id}',      [InquiryApiController::class, 'destroy']);
 });
 
-// ─── Admin-only endpoints ────────────────────────────────────────
+//Admin-only endpoints 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
     Route::get('/users',           [AdminUserApiController::class, 'index']);
     Route::put('/users/{id}',      [AdminUserApiController::class, 'update']);
