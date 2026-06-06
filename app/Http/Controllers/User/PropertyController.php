@@ -46,6 +46,7 @@ class PropertyController extends Controller
         $validated['has_pool']    = $request->boolean('has_pool');
         $validated['has_gym']     = $request->boolean('has_gym');
         $validated['has_parking'] = $request->boolean('has_parking');
+        $validated['is_available'] = true;
 
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('properties', 'public');

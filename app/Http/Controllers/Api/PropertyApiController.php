@@ -65,6 +65,7 @@ class PropertyApiController extends Controller
         $validated['has_pool']    = (bool) ($request->has_pool ?? false);
         $validated['has_gym']     = (bool) ($request->has_gym ?? false);
         $validated['has_parking'] = (bool) ($request->has_parking ?? false);
+        $validated['is_available'] = true;
 
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('properties', 'public');
