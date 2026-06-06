@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
-// ---------- helpers ----------
+//  helpers 
 const token = () =>
   document.getElementById("property-wizard")?.dataset?.token ?? "";
 
@@ -15,7 +15,7 @@ const api = (path, opts = {}) =>
     ...opts,
   }).then((r) => r.json());
 
-// ---------- Step indicators ----------
+//  Step indicators 
 function StepBar({ step }) {
   const steps = ["Basics", "Details", "Pricing"];
   return (
@@ -53,7 +53,7 @@ function StepBar({ step }) {
   );
 }
 
-// ---------- Step 1: Basics ----------
+//  Basics 
 function StepBasics({ data, onChange, errors, categories = [] }) {
   return (
     <div className="space-y-5">
@@ -159,7 +159,7 @@ function StepBasics({ data, onChange, errors, categories = [] }) {
   );
 }
 
-// ---------- Step 2: Details ----------
+//  Details 
 function StepDetails({ data, onChange, errors }) {
   const amenities = [
     { key: "has_pool", label: "🏊 Pool" },
@@ -286,7 +286,7 @@ function StepDetails({ data, onChange, errors }) {
   );
 }
 
-// ---------- Step 3: Pricing + Live Calculator ----------
+//  Pricing + Live Calculator 
 function StepPricing({ data, onChange, calculation }) {
   return (
     <div className="space-y-5">
@@ -370,7 +370,7 @@ function StepPricing({ data, onChange, calculation }) {
   );
 }
 
-// ---------- Main Wizard ----------
+//  Main Wizard 
 export default function PropertyWizard() {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});

@@ -38,8 +38,8 @@ class AuthApiController extends Controller
             ]);
         }
 
-        $user  = $request->user();
-        // Revoke old tokens for this device (optional — keeps tokens clean)
+        $user = $request->user();
+        // Revoke old spa tokens to keep things clean
         $user->tokens()->where('name', 'spa')->delete();
         $token = $user->createToken('spa')->plainTextToken;
 
