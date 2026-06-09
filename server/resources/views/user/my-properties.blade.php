@@ -9,9 +9,11 @@
   @endif
 
   <div class="flex justify-end mb-6">
-    <a href="{{ route('user.properties.create') }}" class="btn bg-primary hover:bg-secondary text-white border-none rounded-xl">
-      + Add New Property
-    </a>
+    @if(auth()->user()->role !== 'admin')
+      <a href="{{ route('user.properties.create') }}" class="btn bg-primary hover:bg-secondary text-white border-none rounded-xl">
+        + Add New Property
+      </a>
+    @endif
   </div>
 
   {{-- Filter Bar --}}
@@ -43,7 +45,6 @@
             </div>
           @endif
           <div class="absolute top-4 left-4">
-            {{-- is_available is the actual DB column --}}
             <span class="badge {{ $property->is_available ? 'bg-green-500' : 'bg-yellow-500' }} text-white border-none px-3 py-2">
               {{ $property->is_available ? 'Active' : 'Inactive' }}
             </span>
@@ -63,7 +64,6 @@
           <div class="flex items-center gap-2 text-gray-500 text-sm mt-2">
             <span>{{ $property->bedrooms }} Beds</span><span>•</span>
             <span>{{ $property->bathrooms }} Bath</span><span>•</span>
-            {{-- sq_meters is the actual DB column --}}
             <span>{{ $property->sq_meters }} m²</span>
           </div>
           <div class="flex gap-2 mt-4 pt-4 border-t border-accent">
@@ -82,7 +82,9 @@
     @empty
       <div class="col-span-3 text-center py-16 text-gray-500">
         <p class="text-lg mb-4">You haven't listed any properties yet.</p>
-        <a href="{{ route('user.properties.create') }}" class="btn bg-primary text-white border-none rounded-xl">Add Your First Property</a>
+        @if(auth()->user()->role !== 'admin')
+          <a href="{{ route('user.properties.create') }}" class="btn bg-primary text-white border-none rounded-xl">Add Your First Property</a>
+        @endif
       </div>
     @endforelse
   </div>

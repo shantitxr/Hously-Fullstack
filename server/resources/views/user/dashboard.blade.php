@@ -50,15 +50,21 @@
   <div class="bg-white rounded-2xl p-6 shadow-md mb-8">
     <h2 class="text-xl font-semibold text-dark mb-4">Quick Actions</h2>
     <div class="flex flex-wrap gap-4">
-      <a href="{{ route('user.properties.create') }}" class="btn bg-primary hover:bg-secondary text-white border-none rounded-xl">
-        Add New Property
-      </a>
-      <a href="{{ route('user.properties.index') }}" class="btn bg-accent hover:bg-secondary text-dark border-none rounded-xl">
-        View All Properties
-      </a>
-      <a href="{{ route('inquiries.index') }}" class="btn bg-accent hover:bg-secondary text-dark border-none rounded-xl">
-        Check Inquiries
-      </a>
+      @if(auth()->user()->role !== 'admin')
+        <a href="{{ route('user.properties.create') }}" class="btn bg-primary hover:bg-secondary text-white border-none rounded-xl">
+          Add New Property
+        </a>
+        <a href="{{ route('user.properties.index') }}" class="btn bg-accent hover:bg-secondary text-dark border-none rounded-xl">
+          View All Properties
+        </a>
+        <a href="{{ route('inquiries.index') }}" class="btn bg-accent hover:bg-secondary text-dark border-none rounded-xl">
+          Check Inquiries
+        </a>
+      @else
+        <a href="{{ route('admin.dashboard') }}" class="btn bg-primary hover:bg-secondary text-white border-none rounded-xl">
+          Go to Admin Panel
+        </a>
+      @endif
     </div>
   </div>
 
@@ -68,7 +74,9 @@
     <div class="bg-white rounded-2xl p-6 shadow-md">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-dark">Recent Inquiries</h2>
-        <a href="{{ route('inquiries.index') }}" class="text-primary text-sm hover:underline">View all</a>
+        @if(auth()->user()->role !== 'admin')
+          <a href="{{ route('inquiries.index') }}" class="text-primary text-sm hover:underline">View all</a>
+        @endif
       </div>
       <div class="space-y-4">
         @forelse($recentInquiries as $inquiry)
@@ -97,7 +105,9 @@
     <div class="bg-white rounded-2xl p-6 shadow-md">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-dark">Your Properties</h2>
-        <a href="{{ route('user.properties.index') }}" class="text-primary text-sm hover:underline">View all</a>
+        @if(auth()->user()->role !== 'admin')
+          <a href="{{ route('user.properties.index') }}" class="text-primary text-sm hover:underline">View all</a>
+        @endif
       </div>
       <div class="space-y-4">
         @forelse($recentProperties as $property)
@@ -110,7 +120,7 @@
               <p class="text-sm text-gray-500">€{{ number_format($property->price) }}</p>
             </div>
             <span class="badge {{ $property->is_available ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }} border-none">
-              {{ $property->is_available ? 'Active' : 'Unavailable' }}
+              {{ $property->is_available ? 'Active' : 'Inactive' }}
             </span>
           </div>
         @empty

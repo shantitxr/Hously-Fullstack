@@ -138,15 +138,18 @@
                   </span>
                 </div>
                 @auth
-                  <form method="POST" action="{{ route('wishlist.toggle', $property) }}"
-                        class="absolute top-4 right-4">
-                    @csrf
-                    <button type="submit" class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors">
-                      <svg class="w-5 h-5 text-gray-600 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                      </svg>
-                    </button>
-                  </form>
+                  @php $inWishlist = in_array($property->id, $wishlistIds ?? []); @endphp
+                  <button
+                    onclick="toggleWishlist(this, {{ $property->id }})"
+                    data-wishlisted="{{ $inWishlist ? 'true' : 'false' }}"
+                    class="absolute top-4 right-4 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors">
+                    <svg class="w-5 h-5 transition-colors {{ $inWishlist ? 'text-red-500' : 'text-gray-400' }}"
+                         fill="{{ $inWishlist ? 'currentColor' : 'none' }}"
+                         stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                  </button>
                 @endauth
               </figure>
               <div class="card-body p-5">
@@ -185,9 +188,21 @@
       <div class="bg-gradient-to-r from-primary to-secondary rounded-3xl p-12 text-center">
         <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">List Your Property with Us</h2>
         <p class="text-white/90 text-lg mb-8 max-w-2xl mx-auto">Join thousands of property owners who trust Hously.</p>
-        <a href="{{ route('user.properties.create') }}" class="btn bg-white text-primary hover:bg-accent border-none rounded-xl px-8">
-          List Your Property
-        </a>
+        @auth
+          @if(auth()->user()->role !== 'admin')
+            <a href="{{ route('user.properties.create') }}" class="btn bg-white text-primary hover:bg-accent border-none rounded-xl px-8">
+              List Your Property
+            </a>
+          @else
+            <a href="{{ route('admin.dashboard') }}" class="btn bg-white text-primary hover:bg-accent border-none rounded-xl px-8">
+              Go to Admin Panel
+            </a>
+          @endif
+        @else
+          <a href="{{ route('login') }}" class="btn bg-white text-primary hover:bg-accent border-none rounded-xl px-8">
+            Get Started
+          </a>
+        @endauth
       </div>
     </div>
   </section>
@@ -225,5 +240,40 @@
       </div>
     </div>
   </footer>
+@auth
+<script>
+function applyHeart(svg, wishlisted) {
+    svg.setAttribute('fill', wishlisted ? 'currentColor' : 'none');
+    svg.style.color = wishlisted ? '#ef4444' : '#9ca3af';
+    svg.classList.remove('text-red-500', 'text-gray-400');
+}
+
+async function toggleWishlist(btn, propertyId) {
+    const svg = btn.querySelector('svg');
+    const wasWishlisted = btn.dataset.wishlisted === 'true';
+    const nowWishlisted = !wasWishlisted;
+
+    // Optimistic update
+    btn.dataset.wishlisted = nowWishlisted ? 'true' : 'false';
+    applyHeart(svg, nowWishlisted);
+
+    try {
+        const res = await fetch(`/wishlist/${propertyId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        });
+        if (!res.ok) throw new Error('Failed');
+    } catch (e) {
+        // Revert on failure
+        btn.dataset.wishlisted = wasWishlisted ? 'true' : 'false';
+        applyHeart(svg, wasWishlisted);
+    }
+}
+</script>
+@endauth
 </body>
 </html>

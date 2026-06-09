@@ -21,21 +21,28 @@ Route::get('/', function () {
         ->when(request('type'), fn($q) => $q->where('property_type', request('type')))
         ->when(request('listing_type'), fn($q) => $q->where('listing_type', request('listing_type')))
         ->latest()->paginate(12);
-    return view('index', compact('properties'));
+
+    $wishlistIds = auth()->check()
+        ? auth()->user()->wishlist()->pluck('properties.id')->toArray()
+        : [];
+
+    return view('index', compact('properties', 'wishlistIds'));
 })->name('home');
 
 Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
 
 require __DIR__.'/auth.php';
 
-// Authenticated
+// Authenticated (all roles)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
     Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
+// Regular users only (admins blocked by middleware)
+Route::middleware(['auth', 'not.admin'])->group(function () {
     Route::get('/user/properties',                 [UserPropertyController::class, 'index'])->name('user.properties.index');
     Route::get('/user/properties/create',          [UserPropertyController::class, 'create'])->name('user.properties.create');
     Route::post('/user/properties',                [UserPropertyController::class, 'store'])->name('user.properties.store');
@@ -51,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/inquiries/{inquiry}/read',        [InquiryController::class, 'markRead'])->name('inquiries.read');
 });
 
-// Admin
+// Admin only
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/',                           [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/properties',                 [AdminPropertyController::class, 'index'])->name('properties.index');

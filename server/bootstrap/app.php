@@ -12,8 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->statefulApi();
         $middleware->alias([
-            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'admin'     => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'not.admin' => \App\Http\Middleware\EnsureUserIsNotAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -39,6 +39,9 @@
             Dashboard
           </a>
         </li>
+
+        {{-- Only regular users see property/wishlist/inquiry links --}}
+        @if(auth()->user()->role !== 'admin')
         <li>
           <a href="{{ route('user.properties.index') }}"
              class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->routeIs('user.properties.*') ? 'bg-accent text-primary font-medium' : 'text-dark hover:bg-accent' }} transition-colors">
@@ -57,19 +60,19 @@
             Inquiries
           </a>
         </li>
+        @endif
+
+        {{-- Admin gets a direct link to the admin panel --}}
+        @if(auth()->user()->role === 'admin')
+        <li>
+          <a href="{{ route('admin.dashboard') }}"
+             class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->routeIs('admin.*') ? 'bg-primary text-white font-medium' : 'text-dark hover:bg-accent' }} transition-colors">
+            Admin Panel
+          </a>
+        </li>
+        @endif
       </ul>
-      @if(auth()->user()->role === 'admin')
-      <div class="border-t border-accent mt-6 pt-6">
-        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Admin</p>
-        <ul class="space-y-2">
-          <li>
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium {{ request()->routeIs('admin.*') ? 'bg-primary text-white' : 'text-dark hover:bg-accent' }} transition-colors">
-              Admin Panel
-            </a>
-          </li>
-        </ul>
-      </div>
-      @endif
+
       <div class="border-t border-accent mt-6 pt-6">
         <ul class="space-y-2">
           <li>

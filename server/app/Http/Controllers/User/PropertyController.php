@@ -62,14 +62,14 @@ class PropertyController extends Controller
 
     public function edit(Property $property)
     {
-         abort_if($property->user_id !== auth()->id(), 403);
+         abort_if($property->user_id !== auth()->id() && auth()->user()->role !== 'admin', 403);
         $categories = Category::all();
         return view('user.edit-property', compact('property', 'categories'));
     }
 
     public function update(Request $request, Property $property)
     {
-        abort_if($property->user_id !== auth()->id(), 403);
+       abort_if($property->user_id !== auth()->id() && auth()->user()->role !== 'admin', 403);
         $validated = $request->validate([
             'title'           => 'required|string|max:255',
             'description'     => 'required|string',
